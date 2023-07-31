@@ -1,0 +1,30 @@
+---
+- name: install zabbix agent
+  include_tasks: install_agent.yaml
+
+- name: login zabbix-server
+  include_tasks: login.yaml
+
+- name: get template
+  include_tasks: get_template.yaml
+
+- name: get hostgroup
+  include_tasks: get_hostgroup.yaml
+
+#- name: debug template
+#  debug:
+#    var: template_id.json.result[0].templateid
+#
+#- name: debug group
+#  debug:
+#    var: hostgroup_id.json.result[0].groupid
+
+- name: add to zabbix-server
+  include_tasks: add_linux.yaml
+
+- name: debug
+  debug:
+    var: zabbix_host
+
+- name: logout zabbix-server
+  include_tasks: logout.yaml

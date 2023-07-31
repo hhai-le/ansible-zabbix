@@ -1,0 +1,16 @@
+---
+- name: zabbix logout
+  uri:
+    url: "http://{{zabbix_server}}/zabbix/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: '2.0'
+      method: user.logout
+      params: []
+      id: 1
+      auth: "{{auth_id.json.result}}"
+    body_format: json
+    headers:
+      Content-Type: application/json
+    follow_redirects: safe
+  register: result

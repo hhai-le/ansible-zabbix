@@ -1,0 +1,40 @@
+---
+- name: Install MariaDB
+  apt:
+    name: mariadb-server
+    state: present
+  when: ansible_distribution == "ubuntu" or ansible_distribution == "Debian"
+
+- name: install MariaDB
+  yum: 
+    name: mariadb-server
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Start MariaDB
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+
+- name: "create database {{db_name}} "
+  shell: "mysql -u{{mysql_user}} -p{{mysql_password}} -e \"CREATE DATABASE {{db_name}}\""
+
+- name: "create user for {{db_name}} "
+  shell: "mysql -u{{mysql_user}} -p{{mysql_password}} -e \"CREATE USER '{{db_user}}'@'{{db_host}}' IDENTIFIED BY '{{db_pass}}'\""
+
+- name: "grant priv for {{db_user}} " 
+  shell: "mysql -u{{mysql_user}} -p{{mysql_password}} -e \"GRANT ALL ON {{db_name}}.* TO '{{db_user}}'@'{{db_host}}'\""
+
+- name: enable log_bin_trust_function_creators 
+  shell: "mysql -u{{mysql_user}} -e 'SET GLOBAL log_bin_trust_function_creators = 1'"
+
+- name: inital schema and data
+  shell: "nohup gunzip < /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -u{{db_user}} -p{{db_pass}} {{db_name}} >/dev/null 2>&1 &" 
+  async: 30
+  poll: 0
+
+- name: enable log_bin_trust_function_creators
+  shell: "mysql -u{{mysql_user}} -e 'SET GLOBAL log_bin_trust_function_creators = 0'"
+  

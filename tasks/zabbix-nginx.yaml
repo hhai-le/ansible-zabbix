@@ -1,0 +1,13 @@
+---
+- name: install nginx 
+  apt:
+    name: zabbix-nginx-conf
+    state: present
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+
+- name: install nginx 
+  yum:
+    name: zabbix-nginx-conf
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"

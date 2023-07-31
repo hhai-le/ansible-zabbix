@@ -1,0 +1,26 @@
+---
+- name: get template id
+  uri:
+    url: "http://{{zabbix_server}}/zabbix/api_jsonrpc.php"
+    method: POST
+    body_format: json
+    body: |
+      {
+        "jsonrpc": "2.0",
+        "method": "template.get",
+        "params": {
+            "filter": {
+                "name": [
+                    "{{template_name}}"
+                ]
+            }
+        },
+        "auth": "{{auth_id.json.result}}",
+        "id": 1
+      }
+    headers:
+      Content-Type: application/json-rpc
+    follow_redirects: safe
+  register: template_id
+
+

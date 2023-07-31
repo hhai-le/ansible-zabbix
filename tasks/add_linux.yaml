@@ -1,0 +1,44 @@
+- name: add linux host to zabbix
+  uri:
+    url: "http://{{zabbix_server}}/zabbix/api_jsonrpc.php"
+    method: POST
+    body_format: json
+    body: |
+      {
+        "jsonrpc": "2.0",
+        "method": "host.create",
+        "params": {
+          "host": "{{ansible_hostname}}",
+          "interfaces": [
+            {
+              "type": "1",
+              "type": "1",
+              "main": "1",
+              "useip": "1",
+              "ip": "{{ansible_default_ipv4.address}}",
+              "dns": "",
+              "port": "{{zabbix_agent_port}}"
+            }
+          ],
+          "groups": [
+            {
+              "groupid": "{{hostgroup_id.json.result[0].groupid}}"
+            }
+          ],
+          "templates": [
+        	  {
+        		  "templateid": "{{template_id.json.result[0].templateid}}"
+        	  }	
+          ],
+          "inventory_mode": 1,
+          "macros": [
+          
+          ]
+        },
+        "auth": "{{auth_id.json.result}}",
+        "id": 1
+      }
+    headers:
+      Content-Type: application/json-rpc
+    follow_redirects: safe
+  register: zabbix_host

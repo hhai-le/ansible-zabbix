@@ -1,0 +1,49 @@
+---
+- name: Install zabbix repository
+  apt:
+    deb: "{{zabbix_apt_repo}}"
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: Install zabbix agent
+  apt:
+    name: 
+      - zabbix-agent
+      - jq
+    state: present
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: install zabbix repository 
+  yum:
+    name: "{{zabbix_yum_repo}}"
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Install zabbix agent
+  yum:
+    name: 
+      - zabbix-agent
+      - jq
+    state: present
+    update_cache: yes
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Stop service zabbix-agent
+  service:
+    name: zabbix-agent
+    state: stopped
+
+- name: Remove zabbix config file
+  file:
+    path: /etc/zabbix/zabbix_agentd.conf
+    state: absent
+
+- name: Create new zabbix config file from template
+  template:
+    src: zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+
+- name: Start service zabbix-agent
+  systemd:
+    name: zabbix-agent
+    state: restarted

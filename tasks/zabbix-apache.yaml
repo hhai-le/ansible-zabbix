@@ -1,0 +1,30 @@
+---
+- name: install apache 
+  apt:
+    name: zabbix-apache-conf
+    state: present
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: install apache 
+  yum:
+    name: zabbix-apache-conf
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: install language for apache2
+  shell: "locale-gen en_US en_US.utf8 en_US.UTF-8"
+
+- name: zabbix-server.conf
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+
+- name: apache.conf
+  template:
+    src: apache.conf.j2
+    dest: /etc/zabbix/apache.conf
+
+- name: zabbix.conf.php
+  template:
+    src: zabbix.conf.php.j2
+    dest: /etc/zabbix/web/zabbix.conf.php

@@ -1,0 +1,9 @@
+---
+# tasks file for zabbix
+- name: install zabbix_server
+  include_tasks: zabbix_server.yml
+  when: server == 1 
+
+- name: install zabbix_agent
+  include_tasks: zabbix_agent.yml
+  when: agent == 1 

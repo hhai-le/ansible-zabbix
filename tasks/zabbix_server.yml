@@ -1,0 +1,58 @@
+---
+# tasks file for zabbix-server
+#- name: download zabbix-server package
+#  get_url:
+#    url: https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu22.04_all.deb
+#    dest: /tmp/zabbix-release_6.4-1+ubuntu22.04_all.deb
+#
+#- name: install zabbix-server deb
+#  apt:
+#    deb: /tmp/zabbix-release_6.4-1+ubuntu22.04_all.deb
+
+- name: install zabbix-server common packages
+  apt:
+    name:
+      - zabbix-frontend-php 
+      - zabbix-sql-scripts
+    state: present
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: install zabbix-server common packages
+  yum:
+    name:
+      - zabbix-selinux-policy 
+      - zabbix-sql-scripts
+    state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: install  apache
+  include_tasks: zabbix-apache.yaml
+  when: web_type == "apache"
+
+- name: install nginx
+  include_tasks: zabbix-nginx.yaml
+  when: web_type == "nginx"
+
+- name: install zabbix mysql
+  include_tasks: zabbix-mysql.yaml
+  when: db_type == "mysql"
+  
+- name: install postgres
+  include_tasks: zabbix-postgres.yaml
+  when: db_type == "pgsql"
+
+- name: start zabbix server
+  systemd:
+    name: zabbix-server
+    state: started
+
+- name: restart zabbix server
+  systemd:
+    name: apache2
+    state: restarted
+
+- name: start zabbix agent
+  systemd:
+    name: zabbix-agent
+    state: restarted
+
